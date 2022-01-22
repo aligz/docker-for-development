@@ -1,0 +1,118 @@
+version: '3.1'
+
+networks:
+  development:
+
+services:
+  sites:
+    build:
+      context: ./dockerfiles
+      dockerfile: nginx.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./sites:/var/www:delegated
+      - ./dockerfiles/nginx:/etc/nginx/conf.d:ro
+    depends_on:
+      - php
+      - mysql
+    networks:
+      - development
+
+  mysql:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: mysql-8
+    restart: always
+    ports:
+      - 3306:3306
+    environment: 
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./data/mysql-8:/var/lib/mysql
+    networks:
+      - development
+
+  # Main PHP Version
+  php:
+    build: 
+      context: ./dockerfiles
+      dockerfile: php.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    user: $UID:$GID
+    container_name: php-74
+    restart: unless-stopped
+    volumes:
+      - ./sites:/var/www:delegated
+    networks:
+      - development
+      
+  php71:
+    build: 
+      context: ./dockerfiles
+      dockerfile: php71.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    user: $UID:$GID
+    container_name: php-71
+    # restart: unless-stopped
+    volumes:
+      - ./sites:/var/www:delegated
+    networks:
+      - development
+      
+  php73:
+    build: 
+      context: ./dockerfiles
+      dockerfile: php73.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    user: $UID:$GID
+    container_name: php-73
+    # restart: unless-stopped
+    volumes:
+      - ./sites:/var/www:delegated
+    networks:
+      - development
+
+  composer:
+    build: 
+      context: ./dockerfiles
+      dockerfile: composer.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    user: $UID:$GID
+    container_name: composer
+    volumes:
+      - ./sites:/var/www:delegated
+    depends_on:
+      - php
+    entrypoint: ['composer', '--ignore-platform-reqs', '--no-scripts']
+    networks:
+      - development
+  
+  npm:
+    image: node:12.22
+    user: $UID:$GID
+    container_name: npm-12
+    volumes:
+      - ./sites:/var/www
+    ports:
+      - 3000
+    working_dir: /var/www
+    entrypoint: ['npm']
+    networks:
+      - development

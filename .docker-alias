@@ -1,0 +1,14 @@
+# docker exec -it -w "/var/www/$workdir" $container /bin/sh
+dec() {
+    docker exec -it -w "/var/www/$1" $2 /bin/sh
+}
+
+# docker-compose run --rm -w "/var/www/$workdir" $service $command $options
+dcr() {
+    docker-compose run --rm -w "/var/www/$1" $2 $3
+}
+
+# laravel artisan: $workdir $artisan_command
+artisan() {
+    docker exec -it -w "/var/www/$1" php-74 php artisan "${@:2}"
+}

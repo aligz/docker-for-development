@@ -72,7 +72,22 @@ services:
       - ./sites:/var/www:delegated
     networks:
       - development
-      
+
+  php5:
+    build: 
+      context: ./dockerfiles
+      dockerfile: php5.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    user: $UID:$GID
+    container_name: php-5
+    # restart: unless-stopped
+    volumes:
+      - ./sites:/var/www:delegated
+    networks:
+      - development
+
   php71:
     build: 
       context: ./dockerfiles

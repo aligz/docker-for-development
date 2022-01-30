@@ -3,12 +3,24 @@ dec() {
     docker exec -it -w "/var/www/$1" $2 /bin/sh
 }
 
-# docker-compose run --rm -w "/var/www/$workdir" $service $command $options
+# docker-compose -f "/path/docker-compose.yml" run --rm -w "/var/www/$workdir" $service $command $options
 dcr() {
-    docker-compose run --rm -w "/var/www/$1" $2 $3
+    docker-compose -f "$1/docker-compose.yml" --env-file "$1/.env" run --rm -w "/var/www/$2" $3 "${@:4}"
 }
 
 # laravel artisan: $workdir $artisan_command
 artisan() {
     docker exec -it -w "/var/www/$1" php-74 php artisan "${@:2}"
+}
+
+mysql() {
+    docker exec -it mysql-8 /bin/sh
+}
+
+nginx() {
+    docker exec -it nginx /bin/sh
+}
+
+npm() {
+    dcr $1 $2 npm "${@:3}"
 }

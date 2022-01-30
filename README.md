@@ -23,7 +23,7 @@ To run additional service, like composer or npm, you can run this command:
     
 For file permission, I recommend for non root user, and this compose is designed for non root user.
 ## Custom Command
-There some aliases command :
+There some aliases command in `.docker-alias` file :
 
  1. Docker exec command to run bash inside docker service
 	`dec {project_folder} {service}`
@@ -37,3 +37,5 @@ There some aliases command :
     `nginx`
  6. Npm shell
     `npm`
+
+You need export `.docker-alias` file in your bash profile to use this commands.
